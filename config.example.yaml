@@ -1,0 +1,45 @@
+# cp config.example.yaml config.yaml 후 수정
+db: jobwatch.db
+interval_seconds: 600   # watch 모드 확인 주기 (초)
+
+sources:
+  # 사람인 공식 API — https://oapi.saramin.co.kr 에서 access-key 발급
+  - type: saramin
+    access_key: ${SARAMIN_ACCESS_KEY}
+    pages: 2
+    params:
+      keywords: "사무보조"
+      loc_cd: "101000"      # 서울 전체
+      # job_type: "4"       # 4 = 아르바이트
+
+  # RSS/Atom 피드를 주는 사이트면 아무거나
+  # - type: rss
+  #   name: some-board
+  #   url: https://example.com/jobs.rss
+  #   company_separator: " - "   # 제목이 "회사 - 공고명" 꼴일 때
+
+  # 직접 만든 크롤러가 JSON 파일을 떨궈주는 경우
+  # - type: json
+  #   name: my-crawler
+  #   path: jobs.json
+
+filter:
+  # 기본 키워드(상시채용, 물류센터, 쿠팡, 상하차 ...)에 추가로 거를 단어
+  extra_keywords: []
+  # 이 중 하나라도 있어야 알림 (비우면 제한 없음)
+  include_keywords: []
+  blocked_companies:
+    - 쿠팡풀필먼트서비스
+  repost_threshold: 1       # 같은 회사+제목이 전에 1번이라도 올라왔으면 재게시로 봄
+  company_max_posts: 5      # 14일 동안 한 회사가 5건 이상 → 대량채용
+  company_window_days: 14
+  skip_always_open: true    # 마감유형이 상시/수시면 거름
+  max_age_days: 30          # 게시된 지 30일 넘은 공고는 거름
+
+notifiers:
+  - type: console
+  # - type: telegram
+  #   bot_token: ${TELEGRAM_BOT_TOKEN}
+  #   chat_id: ${TELEGRAM_CHAT_ID}
+  # - type: discord
+  #   webhook_url: ${DISCORD_WEBHOOK_URL}
